@@ -1,0 +1,43 @@
+================================================================================
+                    DERECHOS DE AUTOR Y LICENCIA DE USO
+                     STARVIOS OBS VOICE ASSISTANT v1.0
+================================================================================
+
+Creado y Desarrollado por: CORNEJOXx
+Año: 2026
+Todos los derechos reservados © CORNEJOXx.
+
+--------------------------------------------------------------------------------
+1. DECLARACIÓN DE AUTORÍA
+--------------------------------------------------------------------------------
+Este software, sus componentes de interfaz web, su integración con OBS Studio, 
+sus scripts de automatización en Python (.py), ejecutables por lotes (.bat) y 
+estilos visuales son obra y creación original de CORNEJOXx.
+
+--------------------------------------------------------------------------------
+2. CONDICIONES OBLIGATORIAS DE DIFUSIÓN Y REDISTRIBUCIÓN
+--------------------------------------------------------------------------------
+Si este programa o cualquiera de sus archivos es compartido, difundido, enviado 
+o transferido a terceros:
+
+a) DEBE CONSERVARSE LA AUTORÍA: En todo momento debe figurar claramente el nombre 
+   de CORNEJOXx como creador y autor intelectual original.
+b) PROHIBICIÓN DE ELIMINACIÓN DE FIRMAS: Queda terminantemente prohibido alterar,
+   ocultar, borrar o reemplazar el nombre de CORNEJOXx en la consola de inicio, 
+   el código fuente, el panel web, los banners o este documento.
+c) PROHIBICIÓN DE APROPIACIÓN: Ninguna persona o entidad ajena puede adjudicarse 
+   la creación o autoría de esta herramienta.
+d) PROHIBICIÓN DE VENTA NO AUTORIZADA: Queda prohibida la venta o comercialización 
+   de este software sin el consentimiento expreso y por escrito de CORNEJOXx.
+
+--------------------------------------------------------------------------------
+3. USO PERMITIDO
+--------------------------------------------------------------------------------
+Se autoriza a los creadores de contenido y streamers el uso libre de este 
+asistente en sus directos y transmisiones en Starvios, Twitch, YouTube, Kick 
+o plataformas afines, reconociendo la autoría original de CORNEJOXx.
+
+================================================================================
+Firma Digital de Autor: CORNEJOXx
+Fecha de Registro: 2026
+================================================================================

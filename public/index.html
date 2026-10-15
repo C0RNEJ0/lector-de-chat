@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starvios Assistant — Lector Privado de Chat para OBS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <div class="app-layout">
+    <!-- Top Navigation Header -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" x2="12" y1="19" y2="22"/>
+          </svg>
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h1 class="brand-title">Starvios Assistant</h1>
+            <span class="author-badge" title="Autor y Desarrollador Oficial">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="badge-icon">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              por CORNEJOXx
+            </span>
+          </div>
+          <p class="brand-subtitle">Lector de Chat Privado con Voz para OBS</p>
+        </div>
+      </div>
+
+      <div class="header-status-group">
+        <!-- Live speaking indicator -->
+        <div id="speakingIndicator" class="speaking-indicator hidden">
+          <div class="sound-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span class="speaking-text" id="speakingText">Leyendo mensaje...</span>
+        </div>
+
+        <div id="connectionBadge" class="status-badge connecting">
+          <span class="status-dot"></span>
+          <span id="connectionText">Conectando...</span>
+        </div>
+
+        <div id="liveBadge" class="status-badge stream-status offline">
+          <span class="live-dot"></span>
+          <span id="liveText">Canal Offline</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container Grid -->
+    <main class="dashboard-grid">
+      <!-- Left Column: Settings and OBS Guide -->
+      <section class="panel-column controls-column">
+        <!-- OBS Integration Card -->
+        <div class="card obs-card">
+          <div class="card-header">
+            <div class="card-icon obs-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="card-title">Chat en Directo (OBS)</h2>
+              <p class="card-desc">Para mostrar el chat visual en tu transmisión</p>
+            </div>
+          </div>
+
+          <!-- Token del Canal -->
+          <div class="obs-url-container" style="margin-bottom: 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+              <label class="input-label" style="margin-bottom:0">1. Token de tu Canal (Starvios):</label>
+              <span id="tokenStatusBadge" style="font-size: 11px; background: rgba(255, 93, 158, 0.2); color: #ff5d9e; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Sin configurar</span>
+            </div>
+            <div class="copy-input-row">
+              <input type="text" id="channelTokenInput" spellcheck="false" class="clean-input" placeholder="Pega aquí tu token de Starvios...">
+              <button id="saveTokenBtn" class="btn btn-primary" style="padding: 0 16px;">
+                <span>Guardar</span>
+              </button>
+            </div>
+            <div id="saveTokenFeedback" class="copy-feedback">¡Token guardado! Conectando con tu chat...</div>
+          </div>
+
+          <div class="obs-url-container">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+              <label class="input-label" style="margin-bottom:0">2. Overlay Local (Recomendado - 0 Delay):</label>
+              <span style="font-size: 11px; background: rgba(92, 255, 103, 0.2); color: #5CFF67; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Instantáneo</span>
+            </div>
+            <div class="copy-input-row">
+              <input type="text" id="localObsUrlInput" readonly spellcheck="false" class="clean-input" value="http://localhost:7890/overlay.html">
+              <button id="copyLocalObsBtn" class="btn btn-primary" style="padding: 0 16px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <span>Copiar</span>
+              </button>
+            </div>
+            <div id="copyLocalFeedback" class="copy-feedback">¡Enlace copiado! Pégalo en OBS como Fuente de Navegador.</div>
+          </div>
+
+          <div class="obs-url-container" style="margin-top: 12px;">
+            <label class="input-label">3. Overlay Oficial Starvios (Nube):</label>
+            <div class="copy-input-row">
+              <input type="text" id="obsUrlInput" readonly spellcheck="false" class="clean-input" placeholder="https://starvios.com/overlay/chat/TU_TOKEN">
+              <button id="copyObsBtn" class="btn btn-secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <span>Copiar</span>
+              </button>
+            </div>
+            <div id="copyFeedback" class="copy-feedback">¡Enlace oficial copiado!</div>
+          </div>
+
+          <div class="obs-instructions">
+            <div class="step-item">
+              <span class="step-num">1</span>
+              <span>En OBS, crea una fuente <strong>Navegador</strong> (Browser Source).</span>
+            </div>
+            <div class="step-item">
+              <span class="step-num">2</span>
+              <span>Pega este enlace, pon ancho <strong>450</strong> y alto <strong>650</strong>.</span>
+            </div>
+            <div class="step-item">
+              <span class="step-num">3</span>
+              <span>¡Listo! El chat saldrá en pantalla y el bot te lo leerá al oído.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Voice & Reader Controls Card -->
+        <div class="card settings-card">
+          <div class="card-header">
+            <div class="card-icon voice-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="card-title">Configuración de Voz (TTS)</h2>
+              <p class="card-desc">Ajusta cómo y cuándo te habla el asistente</p>
+            </div>
+          </div>
+
+          <!-- Main Switch -->
+          <div class="control-row switch-highlight">
+            <div>
+              <div class="control-title">Lector de Voz Activado</div>
+              <div class="control-subtitle">Lee automáticamente cada nuevo mensaje</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="ttsToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Voice Selector -->
+          <div class="control-group">
+            <label for="voiceSelect" class="input-label">Voz del Asistente:</label>
+            <select id="voiceSelect" class="custom-select">
+              <option value="Sabina">Microsoft Sabina (Español México)</option>
+              <option value="Zira">Microsoft Zira (Inglés)</option>
+            </select>
+          </div>
+
+          <!-- Speed Slider -->
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="rateSlider" class="input-label">Velocidad de Lectura:</label>
+              <span id="rateValue" class="slider-badge">+1 (Rápido)</span>
+            </div>
+            <input type="range" id="rateSlider" min="-3" max="5" value="1" step="1" class="custom-range">
+            <div class="range-marks">
+              <span>Lento</span>
+              <span>Normal (0)</span>
+              <span>Ultra Rápido</span>
+            </div>
+          </div>
+
+          <!-- Volume Slider -->
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="volumeSlider" class="input-label">Volumen:</label>
+              <span id="volumeValue" class="slider-badge">100%</span>
+            </div>
+            <input type="range" id="volumeSlider" min="0" max="100" value="100" step="5" class="custom-range">
+          </div>
+
+          <!-- Checkbox Filters -->
+          <div class="toggles-grid">
+            <label class="mini-toggle">
+              <input type="checkbox" id="readUsernameToggle" checked>
+              <span class="mini-box"></span>
+              <span>Decir nombre ("Juan dice:")</span>
+            </label>
+            <label class="mini-toggle">
+              <input type="checkbox" id="filterCommandsToggle" checked>
+              <span class="mini-box"></span>
+              <span>Ignorar comandos (!hola)</span>
+            </label>
+          </div>
+
+          <!-- Test Button -->
+          <div class="action-buttons-row">
+            <button id="testVoiceBtn" class="btn btn-primary pulse-hover">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <span>Probar Voz en Mis Audífonos</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Live Chat Feed -->
+      <section class="panel-column chat-column">
+        <div class="card chat-card">
+          <div class="card-header chat-card-header">
+            <div class="chat-header-title">
+              <div class="card-icon chat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="card-title">Chat en Tiempo Real</h2>
+                <p class="card-desc">Mensajes detectados instantáneamente sin delay</p>
+              </div>
+            </div>
+            
+            <div class="chat-actions">
+              <span id="messageCountBadge" class="count-badge">0 mensajes</span>
+              <button id="clearChatBtn" class="btn btn-ghost btn-sm" title="Limpiar lista">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stream delay advantage tip -->
+          <div class="delay-tip-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tip-icon">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <div>
+              <strong>Ventaja de 8 segundos:</strong> Escuchas estos mensajes al milisegundo en tus oídos, mucho antes de que tus espectadores en el stream vean tu respuesta.
+            </div>
+          </div>
+
+          <!-- Chat messages stream container -->
+          <div id="messagesList" class="messages-list">
+            <!-- Empty state placeholder -->
+            <div id="emptyState" class="empty-state">
+              <div class="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              </div>
+              <h3 class="empty-title">Esperando mensajes en Starvios...</h3>
+              <p class="empty-subtitle">Cuando alguien escriba en tu canal, el mensaje aparecerá aquí y lo escucharás al instante.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Persistent Author & Legal Footer -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <div class="footer-shield">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </div>
+          <div>
+            <div class="footer-author">Starvios OBS Voice Assistant — <strong>Creado y Desarrollado por CORNEJOXx</strong></div>
+            <div class="footer-rights">© 2026 CORNEJOXx. Todos los derechos reservados. Prohibida su copia o redistribución sin conservar la autoría original.</div>
+          </div>
+        </div>
+        <div class="footer-right">
+          <span class="author-pill">
+            <span class="author-pill-dot"></span>
+            Autor Oficial: CORNEJOXx
+          </span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

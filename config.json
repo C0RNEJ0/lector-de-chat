@@ -1,0 +1,11 @@
+{
+  "token": "",
+  "tts_enabled": true,
+  "read_username": true,
+  "filter_commands": true,
+  "rate": 1,
+  "volume": 100,
+  "voice_name": "es-MX-DaliaNeural",
+  "read_donations_first": true,
+  "poll_interval": 1.5
+}

@@ -1,0 +1,257 @@
+<!--
+  ==============================================================================
+  Starvios OBS Chat Overlay v1.0
+  Creado y Desarrollado por: CORNEJOXx
+  Todos los derechos reservados © 2026 CORNEJOXx
+  ==============================================================================
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="author" content="CORNEJOXx">
+  <meta name="copyright" content="CORNEJOXx">
+  <title>Starvios OBS Chat Overlay — por CORNEJOXx</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: transparent;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+    }
+    #chatContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 100%;
+      overflow: hidden;
+    }
+    .chat-bubble {
+      display: inline-block;
+      max-width: 90%;
+      background: rgba(14, 10, 24, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-left: 4px solid var(--accent, #5CFF67);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0,0,0,0.3);
+      color: #FFFFFF;
+      animation: bubbleIn 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      word-break: break-word;
+    }
+    .chat-bubble.fading {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    .bubble-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-owner {
+      background: linear-gradient(135deg, #FF5D9E, #FF8FB8);
+      color: #fff;
+    }
+    .badge-vip {
+      background: linear-gradient(135deg, #C6A8FF, #9D4EDD);
+      color: #fff;
+    }
+    .badge-moderator {
+      background: linear-gradient(135deg, #00C9FF, #92FE9D);
+      color: #0c0814;
+    }
+    .author-name {
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--accent, #5CFF67);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+    .starvies-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(135deg, rgba(247, 201, 72, 0.25), rgba(255, 140, 0, 0.35));
+      border: 1px solid rgba(247, 201, 72, 0.6);
+      color: #F7C948;
+      font-weight: 900;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-left: auto;
+    }
+    .bubble-text {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: #F3F1F8;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+    .chat-bubble.is-donation {
+      border-left-color: #F7C948;
+      background: linear-gradient(125deg, rgba(32, 22, 10, 0.9), rgba(20, 14, 30, 0.88));
+      border: 1.5px solid rgba(247, 201, 72, 0.5);
+      box-shadow: 0 0 20px rgba(247, 201, 72, 0.25), 0 8px 24px rgba(0,0,0,0.5);
+    }
+    @keyframes bubbleIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.92);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chatContainer"></div>
+
+  <script>
+    const container = document.getElementById("chatContainer");
+    const seenIds = new Set();
+    const MAX_VISIBLE = 10;
+    const AUTO_FADE_SECONDS = 25;
+
+    function renderMessage(msg) {
+      if (seenIds.has(msg.id)) return;
+      seenIds.add(msg.id);
+
+      const isDonation = msg.coins && msg.coins > 0;
+      const bubble = document.createElement("div");
+      bubble.className = `chat-bubble ${isDonation ? "is-donation" : ""}`;
+      bubble.style.setProperty("--accent", msg.color || "#5CFF67");
+
+      let badgesHtml = "";
+      if (Array.isArray(msg.badges)) {
+        msg.badges.forEach(b => {
+          if (b === "owner") badgesHtml += '<span class="badge badge-owner">Host</span>';
+          else if (b === "vip") badgesHtml += '<span class="badge badge-vip">VIP</span>';
+          else if (b === "moderator") badgesHtml += '<span class="badge badge-moderator">Mod</span>';
+        });
+      }
+
+      let starviesHtml = "";
+      if (isDonation) {
+        starviesHtml = `<span class="starvies-badge">★ +${msg.coins} Starvies</span>`;
+      }
+
+      const safeName = escapeHtml(msg.name || "Anónimo");
+      const safeBody = escapeHtml(msg.body || "");
+
+      bubble.innerHTML = `
+        <div class="bubble-header">
+          ${badgesHtml}
+          <span class="author-name">${safeName}</span>
+          ${starviesHtml}
+        </div>
+        <div class="bubble-text">${safeBody}</div>
+      `;
+
+      container.appendChild(bubble);
+
+      // Keep max visible
+      while (container.children.length > MAX_VISIBLE) {
+        container.removeChild(container.firstChild);
+      }
+
+      // Auto fade after timer
+      if (AUTO_FADE_SECONDS > 0) {
+        setTimeout(() => {
+          bubble.classList.add("fading");
+          setTimeout(() => {
+            if (bubble.parentNode === container) {
+              container.removeChild(bubble);
+            }
+          }, 650);
+        }, AUTO_FADE_SECONDS * 1000);
+      }
+    }
+
+    function escapeHtml(t) {
+      const d = document.createElement("div");
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    // Connect SSE
+    function connect() {
+      const es = new EventSource("/api/events");
+      es.addEventListener("init", (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.state && data.state.messages) {
+            data.state.messages.slice(-MAX_VISIBLE).forEach(renderMessage);
+          }
+        } catch (err) {}
+      });
+
+      es.addEventListener("init_messages", (e) => {
+        try {
+          const msgs = JSON.parse(e.data);
+          msgs.slice(-MAX_VISIBLE).forEach(renderMessage);
+        } catch (err) {}
+      });
+
+      es.addEventListener("new_message", (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          renderMessage(msg);
+        } catch (err) {}
+      });
+
+      es.addEventListener("cleared", () => {
+        container.innerHTML = "";
+        seenIds.clear();
+      });
+
+      es.onerror = () => {
+        setTimeout(connect, 3000);
+      };
+    }
+
+    // Fallback Polling every 2.5s
+    setInterval(async () => {
+      try {
+        const res = await fetch("/api/status");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.state && Array.isArray(data.state.messages)) {
+            data.state.messages.forEach(renderMessage);
+          }
+        }
+      } catch (e) {}
+    }, 2500);
+
+    connect();
+  </script>
+</body>
+</html>

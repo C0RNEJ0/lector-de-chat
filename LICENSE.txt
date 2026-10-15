@@ -1,0 +1,15 @@
+STARVIOS OBS VOICE ASSISTANT
+Copyright (c) 2026 CORNEJOXx. Todos los derechos reservados.
+
+Se concede permiso para utilizar este software para transmisiones en vivo y uso personal,
+sujeto a las siguientes condiciones irrenunciables:
+
+1. El aviso de copyright anterior, el banner de inicio con el nombre de CORNEJOXx
+   y este aviso de permiso deberán incluirse íntegramente en todas las copias o
+   partes sustanciales del software.
+
+2. Queda estrictamente prohibido remover, modificar o suplantar el nombre de
+   CORNEJOXx como autor original en cualquiera de sus archivos o interfaces.
+
+EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO.
+EN NINGÚN CASO EL AUTOR (CORNEJOXx) SERÁ RESPONSABLE DE NINGÚN RECLAMO O DAÑO.
