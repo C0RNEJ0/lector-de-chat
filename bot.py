@@ -54,12 +54,19 @@ default_config = {
     "poll_interval": 1.5
 }
 
+def clean_token(value):
+    """Accepts a bare token or a full overlay URL and returns only the token."""
+    value = str(value or "").strip().split("?")[0].rstrip("/")
+    return value.split("/")[-1].strip()
+
 def load_config():
     if os.path.exists(CONFIG_PATH):
         try:
             with open(CONFIG_PATH, "r", encoding="utf-8") as f:
                 cfg = json.load(f)
-                return {**default_config, **cfg}
+                merged = {**default_config, **cfg}
+                merged["token"] = clean_token(merged.get("token"))
+                return merged
         except Exception as e:
             print(f"[!] Error leyendo config.json: {e}")
     return default_config.copy()
@@ -452,7 +459,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             with config_lock:
                 for k, v in body_json.items():
                     if k in default_config:
-                        config[k] = v
+                        config[k] = clean_token(v) if k == "token" else v
                 save_config(config)
             
             broadcast_event("config_updated", config)
